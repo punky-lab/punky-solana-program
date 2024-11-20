@@ -1,6 +1,11 @@
 use anchor_lang::prelude::*;
 
 mod config;
+mod errors;
+mod game_account;
+
+use errors::PunkyError;
+use game_account::GameAccount;
 
 declare_id!("6YmNaSBGPwjxnxAFQePz7Z4R9YUMEoaCJGE2JakDrY7D");
 
@@ -10,7 +15,7 @@ pub mod punky_solana_program {
 
     pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
         let account_data = &mut ctx.accounts.game_account;
-        
+
         // Check if account is already initialized
         require!(!account_data.initialized, PunkyError::AlreadyInitialized);
 
@@ -19,8 +24,11 @@ pub mod punky_solana_program {
         account_data.fitness = config::INITIAL_FITNESS;
         account_data.loyalty = config::INITIAL_LOYALTY;
         account_data.balance = config::INITIAL_BALANCE;
-        
-        msg!("Initialized game account for {:?}", ctx.accounts.signer.key());
+
+        msg!(
+            "Initialized game account for {:?}",
+            ctx.accounts.signer.key()
+        );
         Ok(())
     }
 }
@@ -40,21 +48,4 @@ pub struct Initialize<'info> {
     pub game_account: Account<'info, GameAccount>,
 
     pub system_program: Program<'info, System>,
-}
-
-#[account]
-#[derive(InitSpace)]
-pub struct GameAccount {
-    pub initialized: bool,
-
-    pub health: u16,
-    pub fitness: u16,
-    pub loyalty: u16,
-    pub balance: u64,
-}
-
-#[error_code]
-pub enum PunkyError {
-    #[msg("This account has already been initialized")]
-    AlreadyInitialized,
 }
