@@ -43,4 +43,27 @@ describe("punky-solana-program", () => {
     assert.equal(accountData.loyalty, 500);
     assert.equal(accountData.balance.toNumber(), 1000);
   });
+
+  it("Fails to initialize an already initialized account", async () => {
+    const gameAccount = await deriveGameAccountPDA(user.publicKey);
+
+    try {
+      // Attempt to initialize again
+      await program.methods
+        .initialize()
+        .accounts({
+          signer: user.publicKey,
+          gameAccount,
+          systemProgram: anchor.web3.SystemProgram.programId,
+        })
+        .rpc();
+
+      assert.fail("Should have thrown an error");
+    } catch (error) {
+      assert.include(
+        error.message,
+        "custom program error: 0x0"
+      );
+    }
+  });
 });
