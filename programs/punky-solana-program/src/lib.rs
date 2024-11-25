@@ -34,6 +34,12 @@ pub mod punky_solana_program {
         game_account.pet_pet()?;
         Ok(())
     }
+
+    pub fn feed_pet(ctx: Context<UpdateGameAccount>) -> Result<()> {
+        let game_account = &mut ctx.accounts.game_account;
+        game_account.feed_pet()?;
+        Ok(())
+    }
 }
 
 #[derive(Accounts)]

@@ -80,4 +80,22 @@ describe("punky-solana-program", () => {
     assert.equal(accountData.loyalty, 505); // 500 + 5
     assert.equal(accountData.balance.toNumber(), 1001); // 1000 + 1
   });
+
+  it("Can feed the pet", async () => {
+    const gameAccount = await deriveGameAccountPDA(user.publicKey);
+
+    await program.methods
+      .feedPet()
+      .accounts({
+        signer: user.publicKey,
+        gameAccount,
+      })
+      .rpc();
+
+    const accountData = await program.account.gameAccount.fetch(gameAccount);
+    assert.equal(accountData.fitness, 500);
+    assert.equal(accountData.happiness, 510);
+    assert.equal(accountData.loyalty, 510);
+    assert.equal(accountData.balance.toNumber(), 1000);
+  });
 });

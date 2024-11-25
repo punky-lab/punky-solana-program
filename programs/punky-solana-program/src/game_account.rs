@@ -31,4 +31,12 @@ impl GameAccount {
         self.balance += 1;
         Ok(())
     }
+
+    pub fn feed_pet(&mut self) -> Result<()> {
+        self.fitness = stat_clamp(self.fitness + 10);
+        self.happiness = stat_clamp(self.happiness + 5);
+        self.loyalty = stat_clamp(self.loyalty + 5);
+        self.balance -= 1;
+        Ok(())
+    }
 }
