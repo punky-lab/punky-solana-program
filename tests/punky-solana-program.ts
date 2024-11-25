@@ -12,7 +12,6 @@ describe("punky-solana-program", () => {
     .PunkySolanaProgram as Program<PunkySolanaProgram>;
   const user = provider.wallet;
 
-  // Add helper function to derive PDA
   const deriveGameAccountPDA = async (userPubkey: PublicKey) => {
     const [pda] = PublicKey.findProgramAddressSync(
       [Buffer.from("game_account"), userPubkey.toBuffer()],
@@ -22,7 +21,6 @@ describe("punky-solana-program", () => {
   };
 
   it("Is initialized!", async () => {
-    // Derive the game account PDA for this user
     const gameAccount = await deriveGameAccountPDA(user.publicKey);
 
     const tx = await program.methods
@@ -34,21 +32,19 @@ describe("punky-solana-program", () => {
       })
       .rpc();
 
-    // console.log("Your transaction signature", tx);
-
     // Fetch and verify the account data
     const accountData = await program.account.gameAccount.fetch(gameAccount);
-    assert.equal(accountData.health, 500);
+    assert.equal(accountData.happiness, 500);
     assert.equal(accountData.fitness, 500);
     assert.equal(accountData.loyalty, 500);
     assert.equal(accountData.balance.toNumber(), 1000);
+    assert.equal(accountData.initialized, true);
   });
 
   it("Fails to initialize an already initialized account", async () => {
     const gameAccount = await deriveGameAccountPDA(user.publicKey);
 
     try {
-      // Attempt to initialize again
       await program.methods
         .initialize()
         .accounts({
@@ -65,5 +61,23 @@ describe("punky-solana-program", () => {
         "custom program error: 0x0"
       );
     }
+  });
+
+  it("Can pet the pet", async () => {
+    const gameAccount = await deriveGameAccountPDA(user.publicKey);
+
+    await program.methods
+      .petPet()
+      .accounts({
+        signer: user.publicKey,
+        gameAccount,
+      })
+      .rpc();
+
+    const accountData = await program.account.gameAccount.fetch(gameAccount);
+    assert.equal(accountData.fitness, 490); // 500 - 10
+    assert.equal(accountData.happiness, 505); // 500 + 5
+    assert.equal(accountData.loyalty, 505); // 500 + 5
+    assert.equal(accountData.balance.toNumber(), 1001); // 1000 + 1
   });
 });

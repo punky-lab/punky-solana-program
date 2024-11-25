@@ -1,7 +1,7 @@
-pub const INITIAL_HEALTH: u16 = 500;
 pub const INITIAL_FITNESS: u16 = 500;
 pub const INITIAL_LOYALTY: u16 = 500;
 pub const INITIAL_BALANCE: u64 = 1000;
+pub const INITIAL_HAPPINESS: u16 = 500;
 
 // Game mechanics constants
 pub const MIN_STAT_VALUE: u16 = 0;
